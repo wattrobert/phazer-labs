@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { Command, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,29 @@ const navLinks = [
 export function Navbar({ onCommandOpen }: { onCommandOpen: () => void }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const routerState = useRouterState();
+  const { scrollY } = useScroll();
+  const shouldReduceMotion = useReducedMotion();
+  const brandScrollRange = shouldReduceMotion ? [0, 1] : [0, 320];
+  const phazerX = useTransform(
+    scrollY,
+    brandScrollRange,
+    shouldReduceMotion ? [0, 0] : [0, -4],
+  );
+  const phazerOpacity = useTransform(
+    scrollY,
+    brandScrollRange,
+    shouldReduceMotion ? [1, 1] : [1, 0.65],
+  );
+  const labsX = useTransform(
+    scrollY,
+    brandScrollRange,
+    shouldReduceMotion ? [0, 0] : [0, 4],
+  );
+  const labsScale = useTransform(
+    scrollY,
+    brandScrollRange,
+    shouldReduceMotion ? [1, 1] : [1, 1.08],
+  );
   const currentPath = routerState.location.pathname;
 
   return (
@@ -32,12 +55,18 @@ export function Navbar({ onCommandOpen }: { onCommandOpen: () => void }) {
               <span className="text-background font-black text-sm">P</span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="font-bold text-lg tracking-tight text-primary">
+              <motion.span
+                style={{ x: phazerX, opacity: phazerOpacity }}
+                className="font-bold text-lg tracking-tight text-primary"
+              >
                 PHAZER
-              </span>
-              <span className="font-bold text-sm tracking-widest text-accent">
+              </motion.span>
+              <motion.span
+                style={{ x: labsX, scale: labsScale }}
+                className="font-bold text-sm tracking-widest text-accent"
+              >
                 LABS
-              </span>
+              </motion.span>
             </div>
           </Link>
 
